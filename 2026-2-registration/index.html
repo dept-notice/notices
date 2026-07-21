@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026학년도 2학기 신입생·편입생 수강신청 안내</title>
+<style>
+  :root{
+    --ink:#1b2430;
+    --ink-soft:#4b5563;
+    --paper:#f6f4ef;
+    --panel:#ffffff;
+    --line:#e2ddd0;
+    --navy:#254a6b;
+    --navy-deep:#16324a;
+    --gold:#a9761f;
+    --gold-soft:#f4ead2;
+    --alert:#8a3b2b;
+    --alert-soft:#f7e7e0;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+  .header{
+    background:linear-gradient(135deg,var(--navy-deep),var(--navy));
+    color:#f4f1e8;
+    padding:40px 24px 28px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .header::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(115deg,rgba(255,255,255,0.035) 0 2px,transparent 2px 26px);
+    pointer-events:none;
+  }
+  .header .eyebrow{
+    letter-spacing:.28em;
+    font-size:12px;
+    text-transform:uppercase;
+    color:#d8c98f;
+    margin-bottom:12px;
+    font-weight:600;
+  }
+  .header h1{
+    margin:0 0 8px;
+    font-size:clamp(22px,4vw,30px);
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .header p{
+    margin:0;
+    color:#c9d2dc;
+    font-size:14px;
+  }
+
+  .container{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+
+  /* Main tab nav */
+  .main-tabs{
+    display:flex;
+    gap:6px;
+    margin-top:-22px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px;
+    box-shadow:0 8px 24px rgba(22,50,74,0.1);
+    position:relative;
+    z-index:2;
+  }
+  .main-tab-btn{
+    flex:1;
+    appearance:none;
+    border:none;
+    background:transparent;
+    padding:12px 10px;
+    border-radius:999px;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .2s ease, color .2s ease;
+    white-space:nowrap;
+  }
+  .main-tab-btn[aria-selected="true"]{
+    background:var(--navy);
+    color:#fff;
+  }
+  .main-tab-btn:hover:not([aria-selected="true"]){
+    background:var(--paper);
+    color:var(--navy-deep);
+  }
+
+  .page{
+    display:none;
+    margin-top:22px;
+  }
+  .page.active{display:block;}
+
+  .notice-box{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 24px;
+    box-shadow:0 8px 24px rgba(22,50,74,0.08);
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+  }
+  .notice-box strong{color:var(--alert);}
+
+  .schedule-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  @media(max-width:560px){.schedule-grid{grid-template-columns:1fr;}}
+  .schedule-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .schedule-card .label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .schedule-card .date{
+    font-size:18px;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+  .schedule-card.highlight{
+    border-color:var(--gold);
+    background:var(--gold-soft);
+  }
+  .schedule-card.highlight .date{color:var(--alert);}
+
+  h3.section-h{
+    font-size:15px;
+    color:var(--navy-deep);
+    margin:22px 0 10px;
+    padding-left:10px;
+    border-left:4px solid var(--gold);
+  }
+
+  .order-flow{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+    margin:10px 0 6px;
+  }
+  .order-step{
+    background:var(--navy);
+    color:#fff;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:13.5px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .order-arrow{color:#b7bfca;font-weight:700;}
+
+  .note{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    background:#fff;
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    margin:10px 0;
+  }
+  .note.alert{
+    color:var(--alert);
+    background:var(--alert-soft);
+    border:1px dashed #d9b7a8;
+  }
+
+  table.info-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+    margin:10px 0 18px;
+  }
+  table.info-table th,table.info-table td{
+    border:1px solid var(--line);
+    padding:9px 10px;
+    text-align:left;
+  }
+  table.info-table th{
+    background:var(--paper);
+    color:var(--navy-deep);
+    font-weight:700;
+  }
+
+  ol.plain, ul.plain{
+    font-size:14px;
+    color:var(--ink-soft);
+    padding-left:20px;
+    margin:8px 0 18px;
+  }
+  ol.plain li, ul.plain li{margin-bottom:6px;}
+
+  .common-section{
+    margin-top:20px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+  }
+  .common-section h2{
+    font-size:17px;
+    color:var(--navy-deep);
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .common-section h2::before{
+    content:"";
+    width:6px;height:6px;
+    background:var(--gold);
+    border-radius:50%;
+    display:inline-block;
+  }
+
+  .grad-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    font-size:13px;
+  }
+  @media(max-width:640px){.grad-grid{grid-template-columns:1fr 1fr;}}
+  .grad-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px;
+  }
+  .grad-card .tt{font-weight:700;color:var(--navy-deep);margin-bottom:6px;}
+  .grad-card div{color:var(--ink-soft);margin-bottom:2px;}
+
+  .footer-note{
+    text-align:center;
+    color:#8b93a0;
+    font-size:12.5px;
+    margin-top:36px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+
+  /* simple flow (summary in notice tab) */
+  .simple-flow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:14px 0 6px;
+  }
+  .flow-node{
+    flex:1;
+    min-width:110px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 10px;
+    text-align:center;
+  }
+  .flow-node .icon{
+    width:34px;height:34px;
+    margin:0 auto 8px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:700;
+  }
+  .flow-node .label{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+  .flow-arrow-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#b7bfca;
+    font-size:18px;
+    font-weight:700;
+    width:18px;
+  }
+  .flow-wrap{
+    display:flex;
+    align-items:stretch;
+    gap:4px;
+    flex-wrap:wrap;
+  }
+  .goto-link{
+    display:inline-block;
+    margin-top:14px;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--navy);
+    cursor:pointer;
+    text-decoration:underline;
+  }
+
+  /* method tab: image steps */
+  .method-step{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:18px;
+  }
+  .method-step .step-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .method-step .step-badge{
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12.5px;
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .method-step .step-name{
+    font-size:15px;
+    font-weight:700;
+    color:var(--navy-deep);
+  }
+  .method-step img{
+    width:100%;
+    border-radius:8px;
+    border:1px solid var(--line);
+    display:block;
+  }
+  .method-group-label{
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:700;
+    margin:26px 0 12px;
+  }
+  .method-group-label:first-child{margin-top:0;}
+
+  /* courses tab */
+  .pdf-frame-wrap{
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .pdf-frame-wrap iframe{
+    width:100%;
+    height:640px;
+    border:none;
+    display:block;
+  }
+  .pdf-actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 16px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
+    border:1px solid var(--line);
+  }
+  .btn-primary{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  .btn-secondary{
+    background:#fff;
+    color:var(--navy-deep);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="eyebrow">Course Registration Notice</div>
+  <h1>2026학년도 2학기 신입생·편입생 수강신청 안내</h1>
+  <p>탭을 눌러 공지 / 수강신청 방법 / 개설교과목을 확인하세요.</p>
+</div>
+
+<div class="container">
+
+  <div class="main-tabs" role="tablist">
+    <button class="main-tab-btn" role="tab" aria-selected="true" data-page="notice">수강신청공지</button>
+    <button class="main-tab-btn" role="tab" aria-selected="false" data-page="method">수강신청방법</button>
+    <button class="main-tab-btn" role="tab" aria-selected="false" data-page="courses">2학기 개설교과목</button>
+  </div>
+
+  <!-- ================= PAGE 1: 수강신청공지 ================= -->
+  <div class="page active" data-page="notice">
+
+    <div class="notice-box">
+      2026학년도 2학기 <strong>신입생·편입생 수강신청 및 추가 등록금납부 기간</strong>을 안내드립니다.
+      개설교과목 중 본인 소속 학과 교과목을 우선적으로 이수해 주세요. (2학기 개설교과목 탭 참고)
+    </div>
+
+    <div class="schedule-grid" style="grid-template-columns:1fr;">
+      <div class="schedule-card highlight">
+        <div class="label">수강신청 및 추가 등록금납부 기간</div>
+        <div class="date">2026. 7. 21.(화) ~ 7. 28.(화)</div>
+      </div>
+    </div>
+    <div class="schedule-grid">
+      <div class="schedule-card">
+        <div class="label">신청 권장학점</div>
+        <div class="date">18학점</div>
+      </div>
+      <div class="schedule-card">
+        <div class="label">최대 신청 가능 학점 (입학 첫 학기)</div>
+        <div class="date">최대 24학점</div>
+      </div>
+    </div>
+
+    <div class="common-section">
+      <h2>수강신청 순서</h2>
+      <div class="order-flow">
+        <span class="order-step">① 주전공 전공필수</span><span class="order-arrow">→</span>
+        <span class="order-step">② 주전공 전공선택</span><span class="order-arrow">→</span>
+        <span class="order-step">③ 주전공 교양필수</span><span class="order-arrow">→</span>
+        <span class="order-step">④ 주전공 교양선택</span><span class="order-arrow">→</span>
+        <span class="order-step">⑤ 타전공 과목</span>
+      </div>
+      <div class="note">소속 학과에 문의 시 최대 24학점까지 신청 가능하며, 평점평균 3.0 이상이면 다음 정규학기에도 최대 24학점 신청이 가능합니다. (단, 해당 계절학기에는 신청 불가)</div>
+      <div class="note alert">
+        <strong>[편입생 유의사항]</strong> 졸업학기에 '전공 필수/선택, 교양 필수/선택' 이수구분학점이 부족하지 않도록 주전공을 우선하여 졸업학점을 이수하시기 바랍니다.
+      </div>
+    </div>
+
+    <div class="common-section">
+      <h2>수강신청 학점 기준</h2>
+      <table class="info-table">
+        <tr><th>학기 구분</th><th>직전학기 성적</th><th>수강신청 학점</th></tr>
+        <tr><td>정규학기</td><td>3.0 미만</td><td>12 ~ 19학점</td></tr>
+        <tr><td>정규학기</td><td>3.0 이상</td><td>12 ~ 24학점</td></tr>
+        <tr><td>계절학기</td><td>정규학기 포함</td><td>최대 24학점</td></tr>
+      </table>
+      <div class="note">신청 권장학점 : <strong style="color:var(--navy-deep)">18학점</strong> · 조기졸업 희망 시 매 학기 최대 학점 신청을 권장합니다.</div>
+    </div>
+
+    <div class="common-section">
+      <h2>졸업필수학점 (전공이수표)</h2>
+      <div class="grad-grid">
+        <div class="grad-card">
+          <div class="tt">단일전공</div>
+          <div>전공필수 12</div><div>전공선택 33</div><div>교양필수 3</div><div>교양선택 18</div>
+        </div>
+        <div class="grad-card">
+          <div class="tt">연계전공</div>
+          <div>연계전공필수 12</div><div>연계전공선택 33</div><div>+ 기본 이수학점</div>
+        </div>
+        <div class="grad-card">
+          <div class="tt">복수전공</div>
+          <div>복수전공필수 12</div><div>복수전공선택 33</div><div>+ 기본 이수학점</div>
+        </div>
+        <div class="grad-card">
+          <div class="tt">부전공</div>
+          <div>부전공 21</div><div>(부전필 및 부전선)</div><div>+ 기본 이수학점</div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:14px;">졸업학점 : <strong style="color:var(--navy-deep)">140학점 이상</strong> · 공통 교양필수 교과목 : '지구경영으로의 초대'</div>
+    </div>
+
+    <div class="common-section">
+      <h2>수강신청 방법 (요약)</h2>
+      <div class="flow-wrap">
+        <div class="flow-node"><div class="icon">1</div><div class="label">로그인</div></div>
+        <div class="flow-arrow-row">→</div>
+        <div class="flow-node"><div class="icon">2</div><div class="label">수강신청 화면</div></div>
+        <div class="flow-arrow-row">→</div>
+        <div class="flow-node"><div class="icon">3</div><div class="label">학과별 검색</div></div>
+        <div class="flow-arrow-row">→</div>
+        <div class="flow-node"><div class="icon">4</div><div class="label">과목 선택·저장</div></div>
+        <div class="flow-arrow-row">→</div>
+        <div class="flow-node"><div class="icon">5</div><div class="label">신청 완료</div></div>
+        <div class="flow-arrow-row">→</div>
+        <div class="flow-node"><div class="icon">6</div><div class="label">등록금 결제</div></div>
+      </div>
+      <div class="note">화면 캡처와 함께 보는 자세한 방법은 <span class="goto-link" data-goto="method">수강신청방법 탭</span>에서 확인하세요.</div>
+    </div>
+
+    <div class="common-section">
+      <h2>국가장학금 관련 안내</h2>
+      <div class="note alert">
+        수강신청이 완료된 학생만 등록금 수납정보를 한국장학재단에 송부할 수 있습니다. <strong>반드시 기간 내 수강신청을 완료</strong>해 주세요. (신청 완료 후 과목 수 변경 불가)
+      </div>
+    </div>
+
+    <div class="footer-note">문의사항은 소속 학과 사무실로 연락해 주시기 바랍니다.</div>
+  </div>
+
+  <!-- ================= PAGE 2: 수강신청방법 (이미지) ================= -->
+  <div class="page" data-page="method">
+
+    <div class="notice-box">
+      실제 화면 캡처로 수강신청부터 등록금 결제까지의 과정을 순서대로 안내합니다.
+    </div>
+
+    <div class="method-group-label">Step 1 · 홈페이지 로그인</div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">1</span><span class="step-name">수강신청 방법 (위치 안내)</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/01-overview.png" alt="수강신청 방법 위치 안내">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">2</span><span class="step-name">홈페이지 로그인 ① 학번 로그인</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/02-login-student-id.png" alt="학번 로그인 방법">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">3</span><span class="step-name">홈페이지 로그인 ② 인증서 로그인</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/03-login-certificate.png" alt="인증서 로그인 방법">
+    </div>
+
+    <div class="method-group-label">Step 2 · 수강신청</div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">4</span><span class="step-name">수강신청 화면</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/04-registration-screen.png" alt="수강신청 화면">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">5</span><span class="step-name">학과별 수강신청 교과목 검색</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/05-search-by-dept.png" alt="학과별 교과목 검색">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">6</span><span class="step-name">수강신청 과목 선택</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/06-select-courses.png" alt="과목 선택 및 임시저장">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">7</span><span class="step-name">수강신청완료 전, 과목 변경</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/07-change-before-complete.png" alt="과목 변경 방법">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">8</span><span class="step-name">수강신청 과목 확인 및 수강신청완료</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/08-confirm-and-complete.png" alt="수강신청 완료">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">9</span><span class="step-name">수강신청완료 확인</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/09-completion-check.png" alt="수강신청완료 확인">
+    </div>
+
+    <div class="method-group-label">Step 3 · 추가 등록금 납부</div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">10</span><span class="step-name">추가 등록금 납부 (위치 안내)</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/10-tuition-overview.png" alt="추가 등록금 납부 위치">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">11</span><span class="step-name">등록금 확인하기</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/11-check-tuition.png" alt="등록금 확인">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">12</span><span class="step-name">등록금 결제하기</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/12-pay-tuition.png" alt="등록금 결제">
+    </div>
+
+    <div class="method-step">
+      <div class="step-title"><span class="step-badge">13</span><span class="step-name">등록금 납부 영수증 출력</span></div>
+      <img src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/images/13-print-receipt.png" alt="영수증 출력">
+    </div>
+
+    <div class="note alert">수강신청완료 후에는 변경이 불가하니, 완료 전 반드시 신청 내역을 다시 확인해 주세요. 완료 후 변경이 필요하면 학과 사무실로 문의하세요.</div>
+
+  </div>
+
+  <!-- ================= PAGE 3: 2학기 개설교과목 ================= -->
+  <div class="page" data-page="courses">
+
+    <div class="notice-box">
+      2026학년도 2학기 학과별 개설교과목 목록입니다. 본인 소속 학과의 전공필수/전공선택 과목을 우선 확인해 주세요.
+    </div>
+
+    <div class="common-section">
+      <h2>2026학년도 2학기 개설교과목</h2>
+      <div class="pdf-frame-wrap">
+        <iframe src="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/2026-2-courses.pdf" title="2026학년도 2학기 개설교과목"></iframe>
+      </div>
+      <div class="pdf-actions">
+        <a class="btn btn-primary" href="https://raw.githubusercontent.com/dept-notice/notices/main/2026-2-registration/2026-2-courses.pdf" target="_blank" rel="noopener">새 탭에서 크게 보기</a>
+        <a class="btn btn-secondary" href="https://github.com/dept-notice/notices/blob/main/2026-2-registration/2026-2-courses.pdf" target="_blank" rel="noopener">GitHub에서 보기</a>
+      </div>
+      <div class="note">화면에 표가 보이지 않으면 위의 [새 탭에서 크게 보기] 버튼을 눌러 PDF를 직접 확인해 주세요.</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const mainTabs = document.querySelectorAll('.main-tab-btn');
+  const pages = document.querySelectorAll('.page');
+  function activate(name){
+    mainTabs.forEach(t => t.setAttribute('aria-selected', t.dataset.page === name ? 'true' : 'false'));
+    pages.forEach(p => p.classList.toggle('active', p.dataset.page === name));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  mainTabs.forEach(tab => tab.addEventListener('click', () => activate(tab.dataset.page)));
+  document.querySelectorAll('.goto-link').forEach(el => {
+    el.addEventListener('click', () => activate(el.dataset.goto));
+  });
+</script>
+
+</body>
+</html>
