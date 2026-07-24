@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PDF 보기</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #525659; font-family: sans-serif; }
+
+  #toolbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #323639;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+  }
+  #btn-back {
+    background: #555; color: #fff; border: none;
+    padding: 7px 14px; border-radius: 6px;
+    font-size: 14px; cursor: pointer;
+  }
+  #page-info { color: #ccc; font-size: 13px; flex: 1; text-align: center; }
+  #btn-dl {
+    background: #1976D2; color: #fff; border: none;
+    padding: 7px 14px; border-radius: 6px;
+    font-size: 13px; cursor: pointer; text-decoration: none;
+  }
+
+  #loading {
+    color: #fff; text-align: center;
+    padding: 60px 20px; font-size: 15px;
+  }
+
+  #pdf-container {
+    padding: 12px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  canvas {
+    display: block;
+    max-width: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <button id="btn-back" onclick="history.back()">← 뒤로</button>
+  <span id="page-info">로딩 중…</span>
+  <a id="btn-dl" href="#" download>⬇ 저장</a>
+</div>
+
+<div id="loading">📄 PDF를 불러오는 중입니다…</div>
+<div id="pdf-container"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const params = new URLSearchParams(location.search);
+  const file = params.get('file') || 'manual-web.pdf';
+  document.getElementById('btn-dl').href = file;
+  document.getElementById('btn-dl').setAttribute('download', '');
+
+  const DPR = window.devicePixelRatio || 1;
+  const MAX_W = window.innerWidth - 16;
+
+  async function renderPDF() {
+    let pdf;
+    try {
+      pdf = await pdfjsLib.getDocument(file).promise;
+    } catch(e) {
+      document.getElementById('loading').textContent = '❌ PDF를 불러올 수 없습니다.';
+      return;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('page-info').textContent = `총 ${pdf.numPages}페이지`;
+
+    const container = document.getElementById('pdf-container');
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const baseVP = page.getViewport({ scale: 1 });
+      const scale = Math.min((MAX_W / baseVP.width), 2.0) * DPR;
+      const vp = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = vp.width;
+      canvas.height = vp.height;
+      canvas.style.width  = (vp.width  / DPR) + 'px';
+      canvas.style.height = (vp.height / DPR) + 'px';
+      container.appendChild(canvas);
+
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    }
+  }
+
+  renderPDF();
+</script>
+</body>
+</html>
