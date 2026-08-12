@@ -444,11 +444,13 @@
 
       <div class="dept-picker">
         <label for="deptSelect">개설학과 선택</label>
-        <select id="deptSelect" class="dept-select"></select>
+        <select id="deptSelect" class="dept-select">
+          <option value="" selected disabled>학과를 선택해주세요</option>
+        </select>
         <div class="dept-meta" id="deptMeta"></div>
       </div>
 
-      <div id="courseListArea"></div>
+      <div id="courseListArea"><div class="empty-hint">개설학과 선택 창에서 학과를 선택해주세요.</div></div>
     </div>
 
   </div>
@@ -542,11 +544,6 @@
   }
 
   select.addEventListener('change', () => renderDept(parseInt(select.value, 10)));
-  // default to first department
-  if(DEPARTMENTS.length){
-    select.value = 0;
-    renderDept(0);
-  }
 </script>
 
 </body>
