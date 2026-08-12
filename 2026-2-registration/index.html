@@ -305,6 +305,7 @@
         <div class="schedule-card">
           <div class="label">최대 신청 가능 학점</div>
           <div class="date">최대 24학점</div>
+          <div style="font-size:10px;color:var(--ink-soft);margin-top:2px;">(계절학기 포함)</div>
         </div>
       </div>
 
@@ -437,11 +438,13 @@
 
       <div class="dept-picker">
         <label for="deptSelect">개설학과 선택</label>
-        <select id="deptSelect" class="dept-select"></select>
+        <select id="deptSelect" class="dept-select">
+          <option value="" selected disabled>학과를 선택해주세요</option>
+        </select>
         <div class="dept-meta" id="deptMeta"></div>
       </div>
 
-      <div id="courseListArea"></div>
+      <div id="courseListArea"><div class="empty-hint">개설학과 선택 창에서 학과를 선택해주세요.</div></div>
     </div>
 
   </div>
@@ -535,11 +538,6 @@
   }
 
   select.addEventListener('change', () => renderDept(parseInt(select.value, 10)));
-  // default to first department
-  if(DEPARTMENTS.length){
-    select.value = 0;
-    renderDept(0);
-  }
 </script>
 
 </body>
