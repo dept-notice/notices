@@ -32,6 +32,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* Progress cards */
 .pg-row{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px}
 .pg-row.single{grid-template-columns:1fr}
+.pg-row.triple{grid-template-columns:repeat(3,1fr)}
 .pg-card{background:#f5f5f7;border-radius:8px;padding:7px 3px;text-align:center;min-width:0;overflow:hidden}
 .pg-name{font-size:11px;color:#555;line-height:1.3;min-height:28px;display:flex;align-items:center;justify-content:center;word-break:keep-all}
 .pg-num{font-size:21px;font-weight:700;line-height:1}
@@ -131,7 +132,7 @@ td.wk-deadline{font-size:12px;font-weight:600;color:#c0392b;white-space:nowrap;p
   <section class="pane" id="pane-ai">
     <div class="hd-title">AI영어학과 개설교과목 이수체크</div>
     <div class="hd-sub">칸을 클릭 → ✓ 체크 / 자동저장 &nbsp;|&nbsp; <span class="bdg bdg-cert">자격증</span>자격증과목 &nbsp;<span class="bdg bdg-book">교재</span>별도교재구입과목 &nbsp;<span class="bdg bdg-foreign">외국인대상</span>외국인 학생 대상 과목</div>
-    <div class="pg-row single" id="ai-pgr"></div>
+    <div class="pg-row triple" id="ai-pgr"></div>
     <div class="tbl-wrap">
       <table><thead><tr><th style="width:34px">학년</th><th style="width:46px">구분</th><th style="text-align:left;padding-left:5px">교과목 / 담당교수</th><th class="ai-h">체크</th></tr></thead><tbody id="ai-tbd"></tbody></table>
     </div>
@@ -392,6 +393,9 @@ AI_GROUPS.forEach(g=>{
 const AI_STORE_KEY='ai-course-chk-v2';
 let aiChks={},aiStTimer;
 const AI_TOTAL_SLOTS=AI_COURSES.length;
+const AI_CREDIT_PER_COURSE=3;
+const AI_REQ_TOTAL_CREDIT=AI_COURSES.filter(c=>c.div.startsWith('전공필수')).length*AI_CREDIT_PER_COURSE;
+const AI_SEL_TOTAL_CREDIT=AI_COURSES.filter(c=>c.div.startsWith('전공선택')).length*AI_CREDIT_PER_COURSE;
 
 function aiLoad(){
   try{const v=localStorage.getItem(AI_STORE_KEY);if(v)aiChks=JSON.parse(v);}catch(e){aiChks={};}
@@ -411,12 +415,27 @@ function aiToggle(ci){
 }
 
 function aiUpdProg(){
-  let cnt=0;
-  AI_COURSES.forEach((_,ci)=>{if(aiChks[ci])cnt++;});
+  let cnt=0,reqCredit=0,selCredit=0;
+  AI_COURSES.forEach((c,ci)=>{
+    if(!aiChks[ci])return;
+    cnt++;
+    if(c.div.startsWith('전공필수'))reqCredit+=AI_CREDIT_PER_COURSE;
+    else if(c.div.startsWith('전공선택'))selCredit+=AI_CREDIT_PER_COURSE;
+  });
   const card=document.getElementById('ai-pg0');
   if(card){
     card.querySelector('.pg-num').textContent=cnt;
     card.querySelector('.pb').style.width=Math.min(100,Math.round(cnt/AI_TOTAL_SLOTS*100))+'%';
+  }
+  const reqCard=document.getElementById('ai-pg-req');
+  if(reqCard){
+    reqCard.querySelector('.pg-num').textContent=reqCredit;
+    reqCard.querySelector('.pb').style.width=Math.min(100,Math.round(reqCredit/AI_REQ_TOTAL_CREDIT*100))+'%';
+  }
+  const selCard=document.getElementById('ai-pg-sel');
+  if(selCard){
+    selCard.querySelector('.pg-num').textContent=selCredit;
+    selCard.querySelector('.pb').style.width=Math.min(100,Math.round(selCredit/AI_SEL_TOTAL_CREDIT*100))+'%';
   }
 }
 
@@ -427,6 +446,18 @@ function aiRender(){
       <div class="pg-num">0</div>
       <div class="pg-tot">/ ${AI_TOTAL_SLOTS}</div>
       <div class="pb-wrap"><div class="pb" style="width:0%;background:#3346c9"></div></div>
+    </div>
+    <div class="pg-card" id="ai-pg-req">
+      <div class="pg-name">전공필수 학점</div>
+      <div class="pg-num">0</div>
+      <div class="pg-tot">/ ${AI_REQ_TOTAL_CREDIT}학점</div>
+      <div class="pb-wrap"><div class="pb" style="width:0%;background:#c0392b"></div></div>
+    </div>
+    <div class="pg-card" id="ai-pg-sel">
+      <div class="pg-name">전공선택 학점</div>
+      <div class="pg-num">0</div>
+      <div class="pg-tot">/ ${AI_SEL_TOTAL_CREDIT}학점</div>
+      <div class="pb-wrap"><div class="pb" style="width:0%;background:#2f8a4e"></div></div>
     </div>`;
 
   let html='';
