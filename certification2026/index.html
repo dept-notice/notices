@@ -107,6 +107,7 @@ td.cal-content{text-align:left;padding-left:6px;font-size:13px;line-height:1.45;
 td.wk-no{font-weight:600;color:#444;white-space:nowrap;padding:5px 4px}
 td.wk-range{font-size:12px;color:#555;white-space:nowrap;padding:5px 4px}
 td.wk-deadline{font-size:12px;font-weight:600;color:#c0392b;white-space:nowrap;padding:5px 4px}
+tr.wk-exam-row td{background:rgba(140,200,120,.28)}
 
 /* Term glossary tab */
 .term-card{background:#f5f5f7;border-radius:9px;padding:11px 12px;margin-bottom:9px}
@@ -741,9 +742,10 @@ function renderTermSw(){
   });
 }
 function renderWeeks(){
-  document.getElementById('wk-tbd').innerHTML=WEEKS[curTerm].map(w=>
-    `<tr><td class="wk-no">${w[0]}</td><td class="wk-range">${w[1]}</td><td class="wk-deadline">${w[2]}</td></tr>`
-  ).join('');
+  document.getElementById('wk-tbd').innerHTML=WEEKS[curTerm].map(w=>{
+    const isExam=(w[2]==='중간고사'||w[2]==='기말고사');
+    return `<tr class="${isExam?'wk-exam-row':''}"><td class="wk-no">${w[0]}</td><td class="wk-range">${w[1]}</td><td class="wk-deadline">${w[2]}</td></tr>`;
+  }).join('');
 }
 renderTermSw();
 renderWeeks();
